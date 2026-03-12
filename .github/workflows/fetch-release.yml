@@ -38,9 +38,9 @@ jobs:
           grep -E '\.(apk|exe|deb|rpm)$' /tmp/all_assets.json > /tmp/filtered_assets.json || true
           
           if [ -s /tmp/filtered_assets.json ]; then
-            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, assets: .}' /tmp/filtered_assets.json > _data/latest-release.json
+            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: .}' /tmp/filtered_assets.json > _data/latest-release.json
           else
-            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, assets: []}' > _data/latest-release.json
+            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: []}' > _data/latest-release.json
           fi
 
       - name: Commit
