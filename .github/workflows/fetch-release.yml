@@ -7,20 +7,21 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   fetch-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Fetch latest release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           mkdir -p _data
 
-          curl -s -H "Authorization: token $GH_TOKEN" \
+          curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
             https://api.github.com/repos/diego-conti/fanculizzatore/releases/latest > /tmp/release.json
           
           TAG=$(jq -r '.tag_name // empty' /tmp/release.json)
