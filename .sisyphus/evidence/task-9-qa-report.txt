@@ -1,0 +1,9 @@
+QA test file created: /home/diego/dati/workspace/fanculizzatore-webpage/tests/fanculizzatore.test.js
+Test file contains:
+- Page load test
+- Italian content verification
+- Screenshot display verification
+- Carousel navigation test
+- Download links verification
+- Mobile responsive test
+All tests use Playwright framework as required
