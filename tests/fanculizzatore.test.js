@@ -1,19 +1,23 @@
 const { test, expect } = require('@playwright/test');
 
+const baseUrl = process.env.DEPLOYED_URL 
+  ? process.env.DEPLOYED_URL 
+  : 'file://' + process.cwd() + '/index.html';
+
 test.describe('Fanculizzatore Landing Page', () => {
   test('page loads successfully', async ({ page }) => {
-    await page.goto('file://' + process.cwd() + '/index.html');
+    await page.goto(baseUrl);
     await expect(page).toHaveTitle(/Fanculizzatore/);
   });
 
   test('contains Italian content', async ({ page }) => {
-    await page.goto('file://' + process.cwd() + '/index.html');
+    await page.goto(baseUrl);
     await expect(page.locator('text=Scegli quando e quanto insultare')).toBeVisible();
     await expect(page.locator('text=Fanculizzatore è un\'applicazione')).toBeVisible();
   });
 
   test('displays all 4 screenshots', async ({ page }) => {
-    await page.goto('file://' + process.cwd() + '/index.html');
+    await page.goto(baseUrl);
     const screenshots = [
       'assets/contactview.png',
       'assets/mainview.png',
@@ -27,26 +31,21 @@ test.describe('Fanculizzatore Landing Page', () => {
   });
 
   test('carousel navigation works', async ({ page }) => {
-    await page.goto('file://' + process.cwd() + '/index.html');
+    await page.goto(baseUrl);
     
-    // Check first screenshot is visible
     await expect(page.locator('img[src="assets/contactview.png"]')).toBeVisible();
     
-    // Click next button
     await page.click('.carousel-button.next');
     
-    // Check second screenshot is visible
     await expect(page.locator('img[src="assets/mainview.png"]')).toBeVisible();
     
-    // Click next button again
     await page.click('.carousel-button.next');
     
-    // Check third screenshot is visible
     await expect(page.locator('img[src="assets/sent.png"]')).toBeVisible();
   });
 
   test('download links exist', async ({ page }) => {
-    await page.goto('file://' + process.cwd() + '/index.html');
+    await page.goto(baseUrl);
     
     const linuxLink = page.locator('a[href*="fanculizzatore"]:not([href*="deb"])');
     const debLink = page.locator('a[href*="fanculizzatore_1.0.0_amd64.deb"]');
@@ -56,16 +55,23 @@ test.describe('Fanculizzatore Landing Page', () => {
   });
 
   test('page is responsive on mobile', async ({ page }) => {
-    await page.goto('file://' + process.cwd() + '/index.html');
+    await page.goto(baseUrl);
     
-    // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
     
-    // Check that content is visible and not overflowing
     const container = page.locator('.container');
     await expect(container).toBeVisible();
     
-    // Check that carousel buttons are visible
     await expect(page.locator('.carousel-button')).toBeVisible();
+  });
+
+  test('deployed URL returns 200 status', async ({ page }) => {
+    if (!process.env.DEPLOYED_URL) {
+      test.skip();
+      return;
+    }
+    
+    const response = await page.goto(process.env.DEPLOYED_URL);
+    expect(response.status()).toBe(200);
   });
 });
