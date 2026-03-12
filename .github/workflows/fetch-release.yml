@@ -17,21 +17,19 @@ jobs:
         run: |
           mkdir -p _data
 
-          RESPONSE=$(curl -s \
-            -H "Authorization: token $GH_TOKEN" \
-            https://api.github.com/repos/diego-conti/fanculizzatore/releases/latest)
+          curl -s -H "Authorization: token $GH_TOKEN" \
+            https://api.github.com/repos/diego-conti/fanculizzatore/releases/latest > /tmp/release.json
           
-          TAG=$(echo "$RESPONSE" | jq -r '.tag_name // empty')
+          TAG=$(jq -r '.tag_name // empty' /tmp/release.json)
           
           if [ "$TAG" = "null" ] || [ -z "$TAG" ]; then
             echo '{"tag": "", "notes": "", "artifacts": []}' > _data/latest-release.json
             exit 0
           fi
 
-          echo "$RESPONSE" > /tmp/release.json
+          jq -r '.tag_name as $tag | .body as $body | .assets[] | select(.name | test(".(apk|exe|deb|rpm)$"; "i")) | {tag: $tag, notes: $body, name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/artifacts.json
           
-          jq -r '{tag: .tag_name, notes: .body, assets: [.assets[] | select(.name | test(".(apk|exe|deb|rpm)$"; "i"))]}' /tmp/release.json | \
-            jq '{tag: .tag, notes: .notes, assets: [.assets[] | {name: .name, size: .size, download_url: .browser_download_url}]}' > _data/latest-release.json
+          jq -s 'group_by(.tag) | map({tag: .[0].tag, notes: .[0].notes, assets: map({name: .name, size: .size, download_url: .download_url})}) | .[0]' /tmp/artifacts.json > _data/latest-release.json
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
