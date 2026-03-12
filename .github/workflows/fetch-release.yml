@@ -28,7 +28,7 @@ jobs:
             exit 0
           fi
 
-          echo "$RESPONSE" | jq "{tag: .tag_name, notes: .body, assets: [.assets[] | select(.name | test(\"\\.(apk|exe|deb|rpm)$\"; \"i\")) | {name: .name, size: .size, download_url: .browser_download_url}]}" > _data/latest-release.json
+          echo "$RESPONSE" | jq '[.tag_name, .body, .assets] | {tag: .[0], notes: .[1], assets: (.[2] | map(select(.name | test(".(apk|exe|deb|rpm)$"; "i")) | {name: .name, size: .size, download_url: .browser_download_url}))}' > _data/latest-release.json
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
