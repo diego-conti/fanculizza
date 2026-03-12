@@ -65,6 +65,38 @@
             <button class="carousel-button next" aria-label="Successivo">&#9654;</button>
         </section>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const track = document.querySelector('.carousel-track');
+                const slides = Array.from(track.children);
+                const nextButton = document.querySelector('.carousel-button.next');
+                const prevButton = document.querySelector('.carousel-button.prev');
+                
+                let currentIndex = 0;
+                
+                const moveToSlide = (index) => {
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    currentIndex = index;
+                };
+                
+                nextButton.addEventListener('click', () => {
+                    const nextIndex = (currentIndex + 1) % slides.length;
+                    moveToSlide(nextIndex);
+                });
+                
+                prevButton.addEventListener('click', () => {
+                    const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+                    moveToSlide(prevIndex);
+                });
+                
+                // Auto-advance every 5 seconds
+                setInterval(() => {
+                    const nextIndex = (currentIndex + 1) % slides.length;
+                    moveToSlide(nextIndex);
+                }, 5000);
+            });
+        </script>
+
         <section class="downloads">
             <h2>Download</h2>
             <ul>
