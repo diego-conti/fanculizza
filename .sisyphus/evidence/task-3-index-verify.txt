@@ -1,0 +1,3 @@
+File exists: /home/diego/dati/workspace/fanculizzatore-webpage/index.html
+Contains "Fanculizzatore": YES
+Contains "Scegli quando e quanto insultare": YES
