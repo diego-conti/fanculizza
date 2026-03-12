@@ -13,7 +13,7 @@ test.describe('Fanculizzatore Landing Page', () => {
   test('contains Italian content', async ({ page }) => {
     await page.goto(baseUrl);
     await expect(page.locator('text=Scegli quando e quanto insultare')).toBeVisible();
-    await expect(page.locator('text=Fanculizzatore è un\'applicazione')).toBeVisible();
+    await expect(page.locator('text=Fanculizzatore è un\'app')).toBeVisible();
   });
 
   test('displays all 4 screenshots', async ({ page }) => {
