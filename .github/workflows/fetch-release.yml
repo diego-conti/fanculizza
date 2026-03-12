@@ -27,9 +27,17 @@ jobs:
             exit 0
           fi
 
-          jq -r '.tag_name as $tag | .body as $body | .assets[] | select(.name | test(".(apk|exe|deb|rpm)$"; "i")) | {tag: $tag, notes: $body, name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/artifacts.json
+          NOTES=$(jq -r '.body // ""' /tmp/release.json)
           
-          jq -s 'group_by(.tag) | map({tag: .[0].tag, notes: .[0].notes, assets: map({name: .name, size: .size, download_url: .download_url})}) | .[0]' /tmp/artifacts.json > _data/latest-release.json
+          jq -r '.assets[] | {name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/all_assets.json
+          
+          grep -E '\.(apk|exe|deb|rpm)$' /tmp/all_assets.json > /tmp/filtered_assets.json || true
+          
+          if [ -s /tmp/filtered_assets.json ]; then
+            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, assets: .}' /tmp/filtered_assets.json > _data/latest-release.json
+          else
+            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, assets: []}' > _data/latest-release.json
+          fi
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
