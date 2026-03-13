@@ -33,9 +33,8 @@ jobs:
 
           NOTES=$(jq -r '.body // ""' /tmp/release.json)
           
-          jq -r '.assets[] | {name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/all_assets.json
-          
-          grep -E '\.(apk|exe|deb|rpm)$' /tmp/all_assets.json > /tmp/filtered_assets.json || true
+          # Filter assets by extension using jq select() instead of grep (which fails on JSON objects)
+          jq -r '.assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/filtered_assets.json
           
           if [ -s /tmp/filtered_assets.json ]; then
             jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: .}' /tmp/filtered_assets.json > _data/latest-release.json
