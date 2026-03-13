@@ -1,12 +1,17 @@
 {
-  "tag": "v1.0.0-android",
-  "notes": "Fanculizzatore 1.0.0 for Android\\n\\nSideload the APK or install from the release.",
+  "tag": "v1.0.0",
+  "notes": "Fanculizzatore 1.0.0 for all platforms",
   "artifacts": [
     [
       {
         "name": "app-release.apk",
         "size": 64955612,
         "download_url": "/downloads/app-release.apk"
+      },
+      {
+        "name": "fanculizzatore-1.0.0-installer.exe",
+        "size": 14837831,
+        "download_url": "/downloads/fanculizzatore-1.0.0-installer.exe"
       }
     ]
   ]
