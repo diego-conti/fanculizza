@@ -65,7 +65,7 @@ jobs:
                 -o "downloads/$NAME" || echo "Warning: Failed to download $NAME"
               
               # Add to artifacts array for JSON
-              ARTIFACTS_JSON=$(echo "$ARTIFACTS_JSON" | jq --arg name "$NAME" --arg size "$SIZE" --arg url "/downloads/$NAME" '. + [{name: $name, size: ($size|tonumber), download_url: $url}]')
+              ARTIFACTS_JSON=$(echo "$ARTIFACTS_JSON" | jq --arg name "$NAME" --arg size "$SIZE" --arg url "downloads/$NAME" '. + [{name: $name, size: ($size|tonumber), download_url: $url}]')
             done
           fi
           
