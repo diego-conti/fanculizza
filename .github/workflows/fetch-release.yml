@@ -37,9 +37,12 @@ jobs:
           # Get filtered assets with download URLs
           jq -r '.assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/filtered_assets.json
           
+          # Initialize artifacts array
+          ARTIFACTS_JSON="[]"
+          
+          # Process each filtered asset if any exist
           if [ -s /tmp/filtered_assets.json ]; then
             # Download each asset and store locally
-            ARTIFACTS_JSON="[]"
             while IFS= read -r asset; do
               if [ -n "$asset" ]; then
                 NAME=$(echo "$asset" | jq -r '.name')
@@ -47,18 +50,16 @@ jobs:
                 URL=$(echo "$asset" | jq -r '.download_url')
                 
                 echo "Downloading $NAME..."
-                curl -s -L -H "Authorization: token ${{ secrets.GH_TOKEN }}" -o "downloads/$NAME" "$URL"
+                curl -s -f -L -H "Authorization: token ${{ secrets.GH_TOKEN }}" -o "downloads/$NAME" "$URL" || echo "Warning: Failed to download $NAME"
                 
                 # Add to artifacts array for JSON
                 ARTIFACTS_JSON=$(echo "$ARTIFACTS_JSON" | jq --arg name "$NAME" --arg size "$SIZE" --arg url "/downloads/$NAME" '. + [{name: $name, size: ($size|tonumber), download_url: $url}]')
               fi
             done < <(jq -c '.[]' /tmp/filtered_assets.json)
-            
-            # Create final JSON with local download URLs
-            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: .}' <<< "$ARTIFACTS_JSON" > _data/latest-release.json
-          else
-            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: []}' > _data/latest-release.json
           fi
+          
+          # Create final JSON with local download URLs (or empty array if none)
+          jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: .}' <<< "$ARTIFACTS_JSON" > _data/latest-release.json
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
