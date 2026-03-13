@@ -34,28 +34,28 @@ jobs:
 
           NOTES=$(jq -r '.body // ""' /tmp/release.json)
           
-          # Get filtered assets with download URLs
-          jq -r '.assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/filtered_assets.json
+          # Get filtered assets with download URLs as JSON array
+          FILTERED_ASSETS_JSON=$(jq '[.assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {name: .name, size: .size, download_url: .browser_download_url}]' /tmp/release.json)
           
           # Initialize artifacts array
           ARTIFACTS_JSON="[]"
           
           # Process each filtered asset if any exist
-          if [ -s /tmp/filtered_assets.json ]; then
+          ASSET_COUNT=$(echo "$FILTERED_ASSETS_JSON" | jq -r 'length')
+          if [ "$ASSET_COUNT" -gt 0 ]; then
             # Download each asset and store locally
-            while IFS= read -r asset; do
-              if [ -n "$asset" ]; then
-                NAME=$(echo "$asset" | jq -r '.name')
-                SIZE=$(echo "$asset" | jq -r '.size')
-                URL=$(echo "$asset" | jq -r '.download_url')
-                
-                echo "Downloading $NAME..."
-                curl -s -f -L -H "Authorization: token ${{ secrets.GH_TOKEN }}" -o "downloads/$NAME" "$URL" || echo "Warning: Failed to download $NAME"
-                
-                # Add to artifacts array for JSON
-                ARTIFACTS_JSON=$(echo "$ARTIFACTS_JSON" | jq --arg name "$NAME" --arg size "$SIZE" --arg url "/downloads/$NAME" '. + [{name: $name, size: ($size|tonumber), download_url: $url}]')
-              fi
-            done < <(jq -c '.[]' /tmp/filtered_assets.json)
+            for i in $(seq 0 $((ASSET_COUNT - 1))); do
+              # Extract asset properties
+              NAME=$(echo "$FILTERED_ASSETS_JSON" | jq -r ".[$i].name")
+              SIZE=$(echo "$FILTERED_ASSETS_JSON" | jq -r ".[$i].size")
+              URL=$(echo "$FILTERED_ASSETS_JSON" | jq -r ".[$i].download_url")
+              
+              echo "Downloading $NAME..."
+              curl -s -f -L -H "Authorization: token ${{ secrets.GH_TOKEN }}" -o "downloads/$NAME" "$URL" || echo "Warning: Failed to download $NAME"
+              
+              # Add to artifacts array for JSON
+              ARTIFACTS_JSON=$(echo "$ARTIFACTS_JSON" | jq --arg name "$NAME" --arg size "$SIZE" --arg url "/downloads/$NAME" '. + [{name: $name, size: ($size|tonumber), download_url: $url}]')
+            done
           fi
           
           # Create final JSON with local download URLs (or empty array if none)
