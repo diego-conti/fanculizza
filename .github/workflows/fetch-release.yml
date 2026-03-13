@@ -68,8 +68,12 @@ jobs:
             done
           fi
           
-          # Create final JSON with local download URLs (or empty array if none)
-          jq --arg tag "$TAG" --arg notes "$NOTES" --argjson artifacts "$ARTIFACTS_JSON" '{tag: $tag, notes: $notes, artifacts: $artifacts}' > _data/latest-release.json
+          # Create final JSON by constructing the complete object
+          jq -n \
+            --arg tag "$TAG" \
+            --arg notes "$NOTES" \
+            --argjson artifacts "$ARTIFACTS_JSON" \
+            '{tag: $tag, notes: $notes, artifacts: $artifacts}' > _data/latest-release.json
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
