@@ -1,11 +1,46 @@
 {
-  "tag": "v1.0.0-windows",
-  "notes": "Fanculizzatore 1.0.0 for Windows. Run the installer to install.",
+  "tag": "v1.0.0",
+  "notes": "Fanculizzatore 1.0.0 for all platforms",
   "artifacts": [
+    {
+      "name": "app-release.apk",
+      "size": 64955612,
+      "download_url": "/downloads/app-release.apk"
+    },
+    {
+      "name": "fanculizzatore-1.0.0-1.x86_64.rpm",
+      "size": 21214264,
+      "download_url": "/downloads/fanculizzatore-1.0.0-1.x86_64.rpm"
+    },
+    {
+      "name": "fanculizzatore-1.0.0-installer.exe",
+      "size": 14837833,
+      "download_url": "/downloads/fanculizzatore-1.0.0-installer.exe"
+    },
+    {
+      "name": "fanculizzatore_1.0.0_amd64.deb",
+      "size": 21229270,
+      "download_url": "/downloads/fanculizzatore_1.0.0_amd64.deb"
+    },
     {
       "name": "fanculizzatore-1.0.0-installer.exe",
       "size": 14837831,
       "download_url": "/downloads/fanculizzatore-1.0.0-installer.exe"
+    },
+    {
+      "name": "fanculizzatore-1.0.0-1.x86_64.rpm",
+      "size": 21214277,
+      "download_url": "/downloads/fanculizzatore-1.0.0-1.x86_64.rpm"
+    },
+    {
+      "name": "fanculizzatore_1.0.0_amd64.deb",
+      "size": 21229312,
+      "download_url": "/downloads/fanculizzatore_1.0.0_amd64.deb"
+    },
+    {
+      "name": "app-release.apk",
+      "size": 64955612,
+      "download_url": "/downloads/app-release.apk"
     }
   ]
 }
