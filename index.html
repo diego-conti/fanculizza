@@ -103,11 +103,46 @@
 
         <section class="downloads">
             <h2>Download</h2>
-            <ul>
-                <li><a href="/downloads/app-release.apk" download>Android APK</a></li>
-            </ul>
-            <p><em>Nota: L'applicazione Android viene generata automaticamente dalle ultime release del repository privato.</em></p>
+            <div id="download-list">
+                <p>Caricamento...</p>
+            </div>
+            <p><em>Nota: Le applicazioni vengono generate automaticamente dalle ultime release del repository privato.</em></p>
         </section>
+        
+        <script>
+            async function loadDownloads() {
+                const downloadList = document.getElementById('download-list');
+                
+                try {
+                    const response = await fetch('/fanculizza/_data/latest-release.json');
+                    if (!response.ok) {
+                        throw new Error('Impossibile caricare i dati della release');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.tag || data.artifacts.length === 0) {
+                        downloadList.innerHTML = '<p>Nessuna release disponibile al momento.</p>';
+                        return;
+                    }
+                    
+                    let artifactsHtml = '<ul>';
+                    for (const artifact of data.artifacts) {
+                        const ext = artifact.name.split('.').pop().toUpperCase();
+                        artifactsHtml += `<li><a href="${artifact.download_url}" download>${ext} - ${artifact.name}</a></li>`;
+                    }
+                    artifactsHtml += '</ul>';
+                    
+                    downloadList.innerHTML = artifactsHtml;
+                    
+                } catch (error) {
+                    downloadList.innerHTML = '<p>Errore nel caricamento dei download.</p>';
+                }
+            }
+            
+            // Load downloads when page loads
+            document.addEventListener('DOMContentLoaded', loadDownloads);
+        </script>
 
         <footer>
             <p>&copy; 2026 <span class="highlight-fanculizzatore">Fanculizzatore</span> - L'app per mandare tutti in culo con stile</p>
