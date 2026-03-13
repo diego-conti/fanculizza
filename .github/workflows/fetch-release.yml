@@ -20,6 +20,7 @@ jobs:
       - name: Fetch latest release
         run: |
           mkdir -p _data
+          mkdir -p downloads
 
           curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
             https://api.github.com/repos/diego-conti/fanculizzatore/releases/latest > /tmp/release.json
@@ -33,11 +34,28 @@ jobs:
 
           NOTES=$(jq -r '.body // ""' /tmp/release.json)
           
-          # Filter assets by extension using jq select() instead of grep (which fails on JSON objects)
+          # Get filtered assets with download URLs
           jq -r '.assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {name: .name, size: .size, download_url: .browser_download_url}' /tmp/release.json > /tmp/filtered_assets.json
           
           if [ -s /tmp/filtered_assets.json ]; then
-            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: .}' /tmp/filtered_assets.json > _data/latest-release.json
+            # Download each asset and store locally
+            ARTIFACTS_JSON="[]"
+            while IFS= read -r asset; do
+              if [ -n "$asset" ]; then
+                NAME=$(echo "$asset" | jq -r '.name')
+                SIZE=$(echo "$asset" | jq -r '.size')
+                URL=$(echo "$asset" | jq -r '.download_url')
+                
+                echo "Downloading $NAME..."
+                curl -s -L -H "Authorization: token ${{ secrets.GH_TOKEN }}" -o "downloads/$NAME" "$URL"
+                
+                # Add to artifacts array for JSON
+                ARTIFACTS_JSON=$(echo "$ARTIFACTS_JSON" | jq --arg name "$NAME" --arg size "$SIZE" --arg url "/downloads/$NAME" '. + [{name: $name, size: ($size|tonumber), download_url: $url}]')
+              fi
+            done < <(jq -c '.[]' /tmp/filtered_assets.json)
+            
+            # Create final JSON with local download URLs
+            jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: .}' <<< "$ARTIFACTS_JSON" > _data/latest-release.json
           else
             jq -s --arg tag "$TAG" --arg notes "$NOTES" '{tag: $tag, notes: $notes, artifacts: []}' > _data/latest-release.json
           fi
@@ -46,7 +64,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: Update latest release data"
-          file_pattern: "_data/latest-release.json"
+          file_pattern: "_data/latest-release.json downloads/*"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
