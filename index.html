@@ -88,10 +88,12 @@
                     moveToSlide(nextIndex);
                 });
                 
-                prevButton.addEventListener('click', () => {
-                    const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
-                    moveToSlide(prevIndex);
-                });
+                if (prevButton) {
+                    prevButton.addEventListener('click', () => {
+                        const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+                        moveToSlide(prevIndex);
+                    });
+                }
                 
                 // Auto-advance every 5 seconds
                 setInterval(() => {
