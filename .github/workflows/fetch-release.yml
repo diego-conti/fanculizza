@@ -44,8 +44,9 @@ jobs:
           # Get the latest release tag for reference
           LATEST_TAG=$(jq -r '.[0].tag_name // empty' /tmp/releases.json)
           
-          # Aggregate all assets from all releases
-          FILTERED_ASSETS_JSON=$(jq '[.[].assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {id: .id, name: .name, size: .size, download_url: .browser_download_url}]' /tmp/releases.json)
+          # Aggregate all assets from all releases, keeping only the latest version of each asset
+          # Sort by release date (newest first) and keep the first occurrence of each asset name
+          FILTERED_ASSETS_JSON=$(jq '[.[].assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {id: .id, name: .name, size: .size, download_url: .browser_download_url}]' /tmp/releases.json | jq 'unique_by(.name)')
           
           # Initialize artifacts array
           ARTIFACTS_JSON="[]"
