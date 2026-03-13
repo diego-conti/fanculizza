@@ -17,7 +17,7 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Fetch latest release
+      - name: Fetch all releases and aggregate assets
         run: |
           mkdir -p _data
           mkdir -p downloads
@@ -30,20 +30,22 @@ jobs:
             echo "Warning: ASSETS_ACCESS_TOKEN not set, falling back to GH_TOKEN for private repo access"
           fi
 
+          # Fetch all releases (not just latest)
           curl -s -H "Authorization: token $ASSETS_TOKEN" \
-            https://api.github.com/repos/diego-conti/fanculizzatore/releases/latest > /tmp/release.json
+            https://api.github.com/repos/diego-conti/fanculizzatore/releases > /tmp/releases.json
           
-          TAG=$(jq -r '.tag_name // empty' /tmp/release.json)
-          
-          if [ "$TAG" = "null" ] || [ -z "$TAG" ]; then
+          # Check if we got any releases
+          RELEASE_COUNT=$(jq 'length' /tmp/releases.json)
+          if [ "$RELEASE_COUNT" -eq 0 ]; then
             echo '{"tag": "", "notes": "", "artifacts": []}' > _data/latest-release.json
             exit 0
           fi
 
-          NOTES=$(jq -r '.body // ""' /tmp/release.json)
+          # Get the latest release tag for reference
+          LATEST_TAG=$(jq -r '.[0].tag_name // empty' /tmp/releases.json)
           
-          # Get filtered assets with ID and browser_download_url
-          FILTERED_ASSETS_JSON=$(jq '[.assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {id: .id, name: .name, size: .size, download_url: .browser_download_url}]' /tmp/release.json)
+          # Aggregate all assets from all releases
+          FILTERED_ASSETS_JSON=$(jq '[.[].assets[] | select(.name | endswith(".apk") or endswith(".exe") or endswith(".deb") or endswith(".rpm")) | {id: .id, name: .name, size: .size, download_url: .browser_download_url}]' /tmp/releases.json)
           
           # Initialize artifacts array
           ARTIFACTS_JSON="[]"
@@ -51,6 +53,8 @@ jobs:
           # Process each filtered asset if any exist
           ASSET_COUNT=$(echo "$FILTERED_ASSETS_JSON" | jq -r 'length')
           if [ "$ASSET_COUNT" -gt 0 ]; then
+            echo "Found $ASSET_COUNT assets to download..."
+            
             # Download each asset using GitHub API (to ensure we can access private assets)
             for i in $(seq 0 $((ASSET_COUNT - 1))); do
               # Extract asset properties
@@ -68,9 +72,12 @@ jobs:
             done
           fi
           
+          # Get notes from the latest release
+          NOTES=$(jq -r '.[0].body // ""' /tmp/releases.json)
+          
           # Create final JSON by constructing the complete object
           jq -n \
-            --arg tag "$TAG" \
+            --arg tag "$LATEST_TAG" \
             --arg notes "$NOTES" \
             --argjson artifacts "$ARTIFACTS_JSON" \
             '{tag: $tag, notes: $notes, artifacts: $artifacts}' > _data/latest-release.json
