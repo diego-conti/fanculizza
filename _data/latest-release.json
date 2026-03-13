@@ -1,5 +1,11 @@
 {
   "tag": "v1.0.0-android",
   "notes": "Fanculizzatore 1.0.0 for Android\\n\\nSideload the APK or install from the release.",
-  "artifacts": []
+  "artifacts": [
+    {
+      "name": "app-release.apk",
+      "size": 64955612,
+      "download_url": "https://github.com/diego-conti/fanculizzatore/releases/download/v1.0.0-android/app-release.apk"
+    }
+  ]
 }
