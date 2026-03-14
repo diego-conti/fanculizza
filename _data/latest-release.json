@@ -1,26 +1,26 @@
 {
-  "tag": "v1.0.2",
-  "notes": "Fanculizzatore 1.0.2 for all platforms",
+  "tag": "v1.0.3",
+  "notes": "Fanculizzatore 1.0.3 for all platforms",
   "artifacts": [
     {
       "name": "app-release.apk",
-      "size": 65726372,
+      "size": 65693604,
       "download_url": "downloads/app-release.apk"
     },
     {
-      "name": "fanculizzatore-1.0.2-1.x86_64.rpm",
-      "size": 21366626,
-      "download_url": "downloads/fanculizzatore-1.0.2-1.x86_64.rpm"
+      "name": "fanculizzatore-1.0.3-1.x86_64.rpm",
+      "size": 21363713,
+      "download_url": "downloads/fanculizzatore-1.0.3-1.x86_64.rpm"
     },
     {
-      "name": "fanculizzatore-1.0.2-installer.exe",
-      "size": 14852476,
-      "download_url": "downloads/fanculizzatore-1.0.2-installer.exe"
+      "name": "fanculizzatore-1.0.3-installer.exe",
+      "size": 14852894,
+      "download_url": "downloads/fanculizzatore-1.0.3-installer.exe"
     },
     {
-      "name": "fanculizzatore_1.0.2_amd64.deb",
-      "size": 21377712,
-      "download_url": "downloads/fanculizzatore_1.0.2_amd64.deb"
+      "name": "fanculizzatore_1.0.3_amd64.deb",
+      "size": 21375482,
+      "download_url": "downloads/fanculizzatore_1.0.3_amd64.deb"
     }
   ]
 }
