@@ -104,11 +104,10 @@
         </script>
 
         <section class="downloads">
-            <h2>Download</h2>
+            <h2>Download <span id="download-version"></span></h2>
             <div id="download-list">
                 <p>Caricamento...</p>
             </div>
-            <p><em>Nota: Le applicazioni vengono generate automaticamente dalle ultime release del repository privato.</em></p>
         </section>
         
         <script>
@@ -127,6 +126,8 @@
                         downloadList.innerHTML = '<p>Nessuna release disponibile al momento.</p>';
                         return;
                     }
+                    
+                    document.getElementById('download-version').textContent = data.tag;
                     
                     let artifactsHtml = '<ul>';
                     for (const artifact of data.artifacts) {
