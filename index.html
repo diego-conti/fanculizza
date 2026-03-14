@@ -6,6 +6,8 @@
     <title>Fanculizzatore</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <link rel="stylesheet" href="style.css">
+    <script data-goatcounter="https://fanculizza.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
     <main class="container">
@@ -132,7 +134,7 @@
                     let artifactsHtml = '<ul>';
                     for (const artifact of data.artifacts) {
                         const ext = artifact.name.split('.').pop().toUpperCase();
-                        artifactsHtml += `<li><a href="${artifact.download_url}" download>${ext} - ${artifact.name}</a></li>`;
+                        artifactsHtml += `<li><a href="${artifact.download_url}" download onclick="trackDownload('${artifact.name}')">${ext} - ${artifact.name}</a></li>`;
                     }
                     artifactsHtml += '</ul>';
                     
@@ -145,6 +147,16 @@
             
             // Load downloads when page loads
             document.addEventListener('DOMContentLoaded', loadDownloads);
+
+            function trackDownload(filename) {
+                if (window.goatcounter && window.goatcounter.count) {
+                    window.goatcounter.count({
+                        path: '/download',
+                        title: 'Download: ' + filename,
+                        event: true
+                    });
+                }
+            }
         </script>
 
         <footer>

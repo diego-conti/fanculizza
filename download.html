@@ -45,6 +45,8 @@
             border-radius: 4px;
         }
     </style>
+    <script data-goatcounter="https://fanculizza.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
     <main class="container">
@@ -106,7 +108,7 @@
                             <h3>${ext}</h3>
                             <p>File: <strong>${artifact.name}</strong></p>
                             <p>Dimensione: ${sizeMB} MB</p>
-                            <a href="${artifact.download_url}" class="download-btn" download>Scarica</a>
+                            <a href="${artifact.download_url}" class="download-btn" download onclick="trackDownload('${artifact.name}')">Scarica</a>
                         </div>
                     `;
                 }
@@ -129,6 +131,16 @@
         }
         
         loadReleases();
+
+        function trackDownload(filename) {
+            if (window.goatcounter && window.goatcounter.count) {
+                window.goatcounter.count({
+                    path: '/download',
+                    title: 'Download: ' + filename,
+                    event: true
+                });
+            }
+        }
     </script>
 </body>
 </html>
