@@ -4,22 +4,22 @@
   "artifacts": [
     {
       "name": "app-release.apk",
-      "size": 65709988,
+      "size": 65726372,
       "download_url": "downloads/app-release.apk"
     },
     {
       "name": "fanculizzatore-1.0.2-1.x86_64.rpm",
-      "size": 21366295,
+      "size": 21366626,
       "download_url": "downloads/fanculizzatore-1.0.2-1.x86_64.rpm"
     },
     {
       "name": "fanculizzatore-1.0.2-installer.exe",
-      "size": 14852157,
+      "size": 14852476,
       "download_url": "downloads/fanculizzatore-1.0.2-installer.exe"
     },
     {
       "name": "fanculizzatore_1.0.2_amd64.deb",
-      "size": 21378860,
+      "size": 21377712,
       "download_url": "downloads/fanculizzatore_1.0.2_amd64.deb"
     }
   ]
